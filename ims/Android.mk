@@ -50,15 +50,6 @@ include $(BUILD_PREBUILT)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE_TAGS := optional
-LOCAL_MODULE := imsservice
-LOCAL_CERTIFICATE := platform
-LOCAL_SRC_FILES := app/imsservice.apk
-LOCAL_MODULE_CLASS := APPS
-LOCAL_MODULE_SUFFIX := $(COMMON_ANDROID_PACKAGE_SUFFIX)
-include $(BUILD_PREBUILT)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE := ImsSettings
 LOCAL_CERTIFICATE := platform
 LOCAL_SRC_FILES := app/ImsSettings.apk
