@@ -1,7 +1,7 @@
 import /init.wifi.rc
 
 on init
-    export LD_SHIM_LIBS /system/bin/gpsd|libdmitry.so
+    export LD_SHIM_LIBS /system/bin/gpsd|libgpsshim.so:/system/lib/libims_engine.so|libimsshim.so
 
     # SEC_SELINUX
     # for audit message
@@ -311,22 +311,6 @@ service healthd-charger /sbin/healthd -c
     seclabel u:r:healthd:s0
 
 #override
-service ril-daemon /system/bin/rild
-    class main
-    socket rild stream 660 root radio
-    socket rild-debug stream 660 radio system
-    socket rild-cas stream 660  casdrm mmb
-    user root
-    group radio cache inet misc audio sdcard_r sdcard_rw log vpn system
-
-service ril-daemon1 /system/bin/rild -c 2
-    class main
-    socket rild2 stream 660 root radio
-    socket rild-debug2 stream 660 radio system
-    user root
-    group radio cache inet misc audio sdcard_r sdcard_rw log system
-    disabled
-
 service media /system/bin/mediaserver
     class main
     user media

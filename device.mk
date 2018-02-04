@@ -18,6 +18,9 @@ $(call inherit-product, vendor/sprd/proprietaries/proprietaries-scx35l.mk)
 # init services
 $(call inherit-product, $(LOCAL_PATH)/init/init_rc.mk)
 
+# gps
+$(call inherit-product, $(LOCAL_PATH)/gps/device-gps.mk)
+
 # Permissions
 PRODUCT_COPY_FILES += \
     external/ant-wireless/antradio-library/com.dsi.ant.antradio_library.xml:system/etc/permissions/com.dsi.ant.antradio_library.xml \
@@ -249,11 +252,29 @@ PRODUCT_PACKAGES += \
     charger_res_images
 
 PRODUCT_PACKAGES += \
-    libdmitry
+    libgpsshim
+
+PRODUCT_PACKAGES += \
+    sec_samsung \
+    rcsopenapi \
+    commonimsinterface \
+    imsmanager \
+    imsmanager-internal \
+    ImsSettings \
+    ImsTelephonyService \
+    libims_engine \
+    libapve-client \
+    libcpve-client \
+    libimsshim
+
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/ims/imsmanager_library.xml:system/etc/permissions/imsmanager_library.xml \
+    $(LOCAL_PATH)/ims/rcsopenapi_library.xml:system/etc/permissions/rcsopenapi_library.xml
 
 PRODUCT_PACKAGES += \
     camera.sc8830 \
     power.sc8830 \
+    libcamoem \
     lights.sc8830 \
     hwcomposer.sc8830 \
     sprd_gsp.sc8830 \

@@ -32,7 +32,8 @@
 #include "log.h"
 #include "util.h"
 
-#define ISMATCH(a,b) (!strncmp(a,b,PROP_VALUE_MAX))
+#define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
+#include <sys/_system_properties.h>
 
 static void import_kernel_hwrev(const std::string& key, const std::string& value, bool for_emulator)
 {
@@ -41,6 +42,17 @@ static void import_kernel_hwrev(const std::string& key, const std::string& value
     if (key == "hw_revision") {
         property_set("ro.revision", value.c_str());
     }
+}
+
+void property_override(char const prop[], char const value[])
+{
+    prop_info *pi;
+
+    pi = (prop_info*) __system_property_find(prop);
+    if (pi)
+        __system_property_update(pi, value, strlen(value));
+    else
+        __system_property_add(prop, strlen(prop), value, strlen(value));
 }
 
 void vendor_load_properties()
@@ -66,7 +78,7 @@ void vendor_load_properties()
         property_set("ro.msms.phone_count", simslot_count);
         property_set("ro.modem.w.count", simslot_count);
         property_set("persist.msms.phone_count", simslot_count);
-        if (ISMATCH(simslot_count, "2"))
+        if (simslot_count[0] == '2')
             property_set("persist.radio.multisim.config", "dsds");
 
         fclose(file);
@@ -75,11 +87,18 @@ void vendor_load_properties()
     std::string bootloader = property_get("ro.bootloader");
     if (strstr(bootloader.c_str(), "J320FN")) {
         /* SM-J320FN */
-        property_set("ro.product.model", "SM-J320FN");
-        property_set("ro.product.device", "j3xnlte");
+        property_override("ro.product.model", "SM-J320FN");
+        property_override("ro.product.device", "j3xnlte");
+    } else if (strstr(bootloader.c_str(), "J320G")) {
+        property_override("ro.product.model", "SM-J320G");
+        property_override("ro.product.device", "j3xlte");
+    }
+       else if (strstr(bootloader.c_str(), "J210F")) {
+        property_override("ro.product.model", "SM-SM-J210F");
+        property_override("ro.product.device", "j2xlte");
     } else {
-        property_set("ro.product.model", "SM-J320F");
-        property_set("ro.product.device", "j3xlte");
+        property_override("ro.product.model", "SM-J320F");
+        property_override("ro.product.device", "j3xlte");
     }
 
     std::string device = property_get("ro.product.device");

@@ -31,21 +31,6 @@
 extern "C" {
 #endif
 
-
-#if defined(ANDROID_SIM_COUNT_2)
-#define SIM_COUNT 2
-#elif defined(ANDROID_SIM_COUNT_3)
-#define SIM_COUNT 3
-#elif defined(ANDROID_SIM_COUNT_4)
-#define SIM_COUNT 4
-#else
-#define SIM_COUNT 1
-#endif
-
-#ifndef ANDROID_MULTI_SIM
-#define SIM_COUNT 1
-#endif
-
 /*
  * RIL version.
  * Value of RIL_VERSION should not be changed in future. Here onwards,
@@ -79,7 +64,7 @@ extern "C" {
 #define CDMA_ALPHA_INFO_BUFFER_LENGTH 64
 #define CDMA_NUMBER_INFO_BUFFER_LENGTH 81
 
-#define MAX_RILDS 3
+#define MAX_RILDS 4
 #define MAX_SOCKET_NAME_LENGTH 6
 #define MAX_CLIENT_ID_LENGTH 2
 #define MAX_DEBUG_SOCKET_NAME_LENGTH 12
@@ -91,15 +76,9 @@ typedef void * RIL_Token;
 
 typedef enum {
     RIL_SOCKET_1,
-#if (SIM_COUNT >= 2)
     RIL_SOCKET_2,
-#if (SIM_COUNT >= 3)
     RIL_SOCKET_3,
-#endif
-#if (SIM_COUNT >= 4)
     RIL_SOCKET_4,
-#endif
-#endif
     RIL_SOCKET_NUM
 } RIL_SOCKET_ID;
 
@@ -558,6 +537,7 @@ typedef struct {
     int errorCode;    /* See 3GPP 27.005, 3.2.5 for GSM/UMTS,
                          3GPP2 N.S0005 (IS-41C) Table 171 for CDMA,
                          -1 if unknown or not applicable*/
+    int v3i;          /* Samsung */
 } RIL_SMS_Response;
 
 /** Used by RIL_REQUEST_WRITE_SMS_TO_SIM */
@@ -661,6 +641,8 @@ typedef struct {
     int             toa;         /* "type" from TS 27.007 7.11 */
     char *          number;      /* "number" from TS 27.007 7.11. May be NULL */
     int             timeSeconds; /* for CF no reply only */
+    char*           startTime;
+    char*           endTime;
 }RIL_CallForwardInfo;
 
 typedef struct {
@@ -1060,28 +1042,13 @@ typedef struct
   int              pin1_replaced;   /* applicable to USIM, CSIM & ISIM */
   RIL_PinState     pin1;
   RIL_PinState     pin2;
-} RIL_AppStatus;
-
-typedef struct
-{
-  RIL_AppType      app_type;
-  RIL_AppState     app_state;
-  RIL_PersoSubstate perso_substate; /* applicable only if app_state ==
-                                       RIL_APPSTATE_SUBSCRIPTION_PERSO */
-  char             *aid_ptr;        /* null terminated string, e.g., from 0xA0, 0x00 -> 0x41,
-                                       0x30, 0x30, 0x30 */
-  char             *app_label_ptr;  /* null terminated string */
-  int              pin1_replaced;   /* applicable to USIM, CSIM & ISIM */
-  RIL_PinState     pin1;
-  RIL_PinState     pin2;
-
   /* Samsung */
   int              pin1_num_retries;
   int              puk1_num_retries;
   int              pin2_num_retries;
   int              puk2_num_retries;
   int              perso_unblock_retries;
-} RIL_AppStatus_samsung;
+} RIL_AppStatus;
 
 /* Deprecated, use RIL_CardStatus_v6 */
 typedef struct
@@ -1104,17 +1071,6 @@ typedef struct
   int           num_applications;                /* value <= RIL_CARD_MAX_APPS */
   RIL_AppStatus applications[RIL_CARD_MAX_APPS];
 } RIL_CardStatus_v6;
-
-typedef struct
-{
-  RIL_CardState card_state;
-  RIL_PinState  universal_pin_state;             /* applicable to USIM and CSIM: RIL_PINSTATE_xxx */
-  int           gsm_umts_subscription_app_index; /* value < RIL_CARD_MAX_APPS, -1 if none */
-  int           cdma_subscription_app_index;     /* value < RIL_CARD_MAX_APPS, -1 if none */
-  int           ims_subscription_app_index;      /* value < RIL_CARD_MAX_APPS, -1 if none */
-  int           num_applications;                /* value <= RIL_CARD_MAX_APPS */
-  RIL_AppStatus_samsung applications[RIL_CARD_MAX_APPS];
-} RIL_CardStatus_v6_samsung;
 
 /** The result of a SIM refresh, returned in data[0] of RIL_UNSOL_SIM_REFRESH
  *      or as part of RIL_SimRefreshResponse_v7
@@ -1819,6 +1775,70 @@ typedef struct {
    * the transmitter is inactive */
   uint32_t rx_mode_time_ms;
 } RIL_ActivityStatsInfo;
+
+typedef struct {
+  int v0i;
+  int v1i;
+  int v2i;
+  char * v3c;
+  int v4i;
+  int v5i;
+  char * v6s;
+  char * v7c;
+  int v8i;
+  char * v9s;
+  char * v10s;
+  char * v11s;
+  char * v12s;
+  char * v13c;
+  int v14i;
+  int v15i;
+  char * v16s;
+} RIL_Phone_Book_Entry;
+
+typedef struct {
+  int v0i;
+  int v1i;
+  int v2i;
+  int v3i;
+  char * v4c;
+} RIL_CB_Config;
+
+typedef struct {
+  int v0i;
+  int v1i;
+  int v2i;
+  int v3i;
+} RIL_Lock_Info;
+
+typedef struct {
+  char * v0c;
+  int v1i;
+  int v2i;
+} RIL_USSD_Encoded;
+
+typedef struct {
+  int v0i;
+  char * oper;
+  char * plmn;
+  int v3i;
+  int v4i;
+  int v5i;
+  int v6i;
+} RIL_PN_List;
+
+typedef struct {
+  int v0i;
+  int v1i;
+  int v2i;
+  int v3i;
+  char * v4c;
+} RIL_StkCcUnsolSsComplete;
+
+typedef struct {
+  int v1i;
+  char * iccId;
+} RIL_SIM_ICCID;
 
 /**
  * RIL_REQUEST_GET_SIM_STATUS
@@ -5926,6 +5946,12 @@ typedef struct {
 #define RIL_REQUEST_GET_INCOMING_COMMUNICATION_BARRING      10027
 #define RIL_REQUEST_SET_INCOMING_COMMUNICATION_BARRING      10028
 #define RIL_REQUEST_QUERY_CNAP                      10029
+#define RIL_REQUEST_SET_TRANSFER_CALL               10030
+#define RIL_REQUEST_GET_DISABLE_2G                  10031
+#define RIL_REQUEST_SET_DISABLE_2G                  10032
+#define RIL_REQUEST_REFRESH_NITZ_TIME               10033
+#define RIL_REQUEST_ENABLE_UNSOL_RESPONSE           10034
+#define RIL_REQUEST_CANCEL_TRANSFER_CALL            10035
 
 /***********************************************************************/
 
@@ -5935,6 +5961,7 @@ typedef struct {
 #define RIL_UNSOL_RELEASE_COMPLETE_MESSAGE          11001
 #define RIL_UNSOL_STK_SEND_SMS_RESULT               11002
 #define RIL_UNSOL_STK_CALL_CONTROL_RESULT           11003
+#define RIL_UNSOL_ACB_INFO_CHANGED                  11005
 #define RIL_UNSOL_DEVICE_READY_NOTI                 11008
 #define RIL_UNSOL_GPS_NOTI                          11009
 #define RIL_UNSOL_AM                                11010
@@ -5954,16 +5981,21 @@ typedef struct {
 #define RIL_UNSOL_HOME_NETWORK_NOTI                 11043
 #define RIL_UNSOL_STK_CALL_STATUS                   11054
 #define RIL_UNSOL_MODEM_CAP                         11056
+#define RIL_UNSOL_SIM_SWAP_STATE_CHANGED            11057
+#define RIL_UNSOL_SIM_COUNT_MISMATCHED              11058
 #define RIL_UNSOL_DUN                               11060
 #define RIL_UNSOL_IMS_PREFERENCE_CHANGED            11061
 #define RIL_UNSOL_SIM_APPLICATION_REFRESH           11062
 #define RIL_UNSOL_UNSOL_UICC_APPLICATION_STATUS     11063
+#define RIL_UNSOL_VOICE_RADIO_BEARER_HO_STATUS      11064
+#define RIL_UNSOL_CLM_NOTI                          11065
 #define RIL_UNSOL_SIM_ICCID_NOTI                    11066
+#define RIL_UNSOL_TIMER_STATUS_CHANGED_NOTI         11067
+#define RIL_UNSOL_PROSE_NOTI                        11068
 
 /***********************************************************************/
 
 
-#if defined(ANDROID_MULTI_SIM)
 /**
  * RIL_Request Function pointer
  *
@@ -5986,34 +6018,6 @@ typedef void (*RIL_RequestFunc) (int request, void *data,
  * This function should return the current radio state synchronously
  */
 typedef RIL_RadioState (*RIL_RadioStateRequest)(RIL_SOCKET_ID socket_id);
-
-#else
-/* Backward compatible */
-
-/**
- * RIL_Request Function pointer
- *
- * @param request is one of RIL_REQUEST_*
- * @param data is pointer to data defined for that RIL_REQUEST_*
- *        data is owned by caller, and should not be modified or freed by callee
- *        structures passed as data may contain pointers to non-contiguous memory
- * @param t should be used in subsequent call to RIL_onResponse
- * @param datalen is the length of "data" which is defined as other argument. It may or may
- *        not be equal to sizeof(data). Refer to the documentation of individual structures
- *        to find if pointers listed in the structure are contiguous and counted in the datalen
- *        length or not.
- *        (Eg: RIL_IMS_SMS_Message where we don't have datalen equal to sizeof(data))
- *
- */
-typedef void (*RIL_RequestFunc) (int request, void *data,
-                                    size_t datalen, RIL_Token t);
-
-/**
- * This function should return the current radio state synchronously
- */
-typedef RIL_RadioState (*RIL_RadioStateRequest)();
-
-#endif
 
 
 /**
@@ -6093,7 +6097,6 @@ typedef struct {
                             loosely defined in LTE Layer 3 spec 24.008 */
 } RIL_PCO_Data;
 
-#ifdef RIL_SHLIB
 struct RIL_Env {
     /**
      * "t" is parameter passed in on previous call to RIL_Notification
@@ -6109,7 +6112,6 @@ struct RIL_Env {
     void (*OnRequestComplete)(RIL_Token t, RIL_Errno e,
                            void *response, size_t responselen);
 
-#if defined(ANDROID_MULTI_SIM)
     /**
      * "unsolResponse" is one of RIL_UNSOL_RESPONSE_*
      * "data" is pointer to data defined for that RIL_UNSOL_RESPONSE_*
@@ -6117,15 +6119,7 @@ struct RIL_Env {
      * "data" is owned by caller, and should not be modified or freed by callee
      */
     void (*OnUnsolicitedResponse)(int unsolResponse, const void *data, size_t datalen, RIL_SOCKET_ID socket_id);
-#else
-    /**
-     * "unsolResponse" is one of RIL_UNSOL_RESPONSE_*
-     * "data" is pointer to data defined for that RIL_UNSOL_RESPONSE_*
-     *
-     * "data" is owned by caller, and should not be modified or freed by callee
-     */
-    void (*OnUnsolicitedResponse)(int unsolResponse, const void *data, size_t datalen);
-#endif
+
     /**
      * Call user-specifed "callback" function on on the same thread that
      * RIL_RequestFunc is called. If "relativeTime" is specified, then it specifies
@@ -6136,13 +6130,6 @@ struct RIL_Env {
 
     void (*RequestTimedCallback) (RIL_TimedCallback callback,
                                    void *param, const struct timeval *relativeTime);
-   /**
-    * "t" is parameter passed in on previous call RIL_Notification routine
-    *
-    * RIL_onRequestAck will be called by vendor when an Async RIL request was received
-    * by them and an ack needs to be sent back to java ril.
-    */
-    void (*OnRequestAck) (RIL_Token t);
 };
 
 
@@ -6173,82 +6160,6 @@ const RIL_RadioFunctions *RIL_Init(const struct RIL_Env *env, int argc, char **a
  *
  */
 const RIL_RadioFunctions *RIL_SAP_Init(const struct RIL_Env *env, int argc, char **argv);
-
-#else /* RIL_SHLIB */
-
-/**
- * Call this once at startup to register notification routine
- *
- * @param callbacks user-specifed callback function
- */
-void RIL_register (const RIL_RadioFunctions *callbacks);
-
-
-/**
- *
- * RIL_onRequestComplete will return as soon as possible
- *
- * @param t is parameter passed in on previous call to RIL_Notification
- *          routine.
- * @param e error code
- *          if "e" != SUCCESS, then response can be null/is ignored
- * @param response is owned by caller, and should not be modified or
- *                 freed by callee
- * @param responselen the length of response in byte
- */
-void RIL_onRequestComplete(RIL_Token t, RIL_Errno e,
-                           void *response, size_t responselen);
-
-/**
- * RIL_onRequestAck will be called by vendor when an Async RIL request was received by them and
- * an ack needs to be sent back to java ril. This doesn't mark the end of the command or it's
- * results, just that the command was received and will take a while. After sending this Ack
- * its vendor's responsibility to make sure that AP is up whenever needed while command is
- * being processed.
- *
- * @param t is parameter passed in on previous call to RIL_Notification
- *          routine.
- */
-void RIL_onRequestAck(RIL_Token t);
-
-#if defined(ANDROID_MULTI_SIM)
-/**
- * @param unsolResponse is one of RIL_UNSOL_RESPONSE_*
- * @param data is pointer to data defined for that RIL_UNSOL_RESPONSE_*
- *     "data" is owned by caller, and should not be modified or freed by callee
- * @param datalen the length of data in byte
- */
-
-void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
-                                size_t datalen, RIL_SOCKET_ID socket_id);
-#else
-/**
- * @param unsolResponse is one of RIL_UNSOL_RESPONSE_*
- * @param data is pointer to data defined for that RIL_UNSOL_RESPONSE_*
- *     "data" is owned by caller, and should not be modified or freed by callee
- * @param datalen the length of data in byte
- */
-
-void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
-                                size_t datalen);
-#endif
-
-/**
- * Call user-specifed "callback" function on on the same thread that
- * RIL_RequestFunc is called. If "relativeTime" is specified, then it specifies
- * a relative time value at which the callback is invoked. If relativeTime is
- * NULL or points to a 0-filled structure, the callback will be invoked as
- * soon as possible
- *
- * @param callback user-specifed callback function
- * @param param parameter list
- * @param relativeTime a relative time value at which the callback is invoked
- */
-
-void RIL_requestTimedCallback (RIL_TimedCallback callback,
-                               void *param, const struct timeval *relativeTime);
-
-#endif /* RIL_SHLIB */
 
 #ifdef __cplusplus
 }

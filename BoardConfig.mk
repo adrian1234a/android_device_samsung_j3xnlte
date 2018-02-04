@@ -89,7 +89,6 @@ TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS := true
 # Init
 TARGET_INIT_VENDOR_LIB := libinit_j3lte
 TARGET_RECOVERY_DEVICE_MODULES := libinit_j3lte
-TARGET_UNIFIED_DEVICE := true
 
 # Boot animation
 TARGET_SCREEN_HEIGHT := 1280
@@ -99,7 +98,7 @@ TARGET_BOOTANIMATION_TEXTURE_CACHE := true
 
 # telephony
 BOARD_PROVIDES_LIBRIL := true
-SIM_COUNT := 2
+BOARD_PROVIDES_RILD := true
 USE_BOOT_AT_DIAG := true
 BOARD_RIL_CLASS := ../../../device/samsung/j3xnlte/ril/java/
 
@@ -109,7 +108,6 @@ TARGET_PROVIDES_LIBLIGHT := true
 # Graphics
 TARGET_BOARD_PLATFORM_GPU := utgard
 TARGET_GPU_PP_CORE := 2
-TARGET_REQUIRES_SYNCHRONOUS_SETSURFACE := true
 BOARD_EGL_NEEDS_HANDLE_VALUE := true
 USE_SPRD_HWCOMPOSER := true
 USE_OPENGL_RENDERER := true
@@ -129,9 +127,6 @@ TARGET_NO_SENSOR_PERMISSION_CHECK := true
 # NFC
 BOARD_NFC_CHIPSET := pn548
 TARGET_USES_NQ_NFC := true
-
-# WEBGL
-ENABLE_WEBGL := true
 
 #######################################################
 # camera configs
@@ -184,6 +179,7 @@ TARGET_BOARD_CAMERA_PRE_ALLOC_CAPTURE_MEM := true
 #sc8830g isp ver 0;sc9630 isp ver 1;sp9832a_2h11 isp version 2
 TARGET_BOARD_CAMERA_ISP_SOFTWARE_VERSION := 2
 #set hal version to 1.0
+TARGET_USES_MEDIA_EXTENSIONS := true
 TARGET_BOARD_CAMERA_HAL_VERSION := 1.0
 #support auto anti-flicker
 TARGET_BOARD_CAMERA_ANTI_FLICKER := true
@@ -199,6 +195,11 @@ TARGET_BOARD_BACK_CAMERA_MIPI := phya
 #select ccir pclk src(source0, source1)
 TARGET_BOARD_FRONT_CAMERA_CCIR_PCLK := source0
 TARGET_BOARD_BACK_CAMERA_CCIR_PCLK := source0
+#third lib
+TARGET_BOARD_USE_THRID_LIB := true
+TARGET_BOARD_USE_THIRD_AWB_LIB_A := true
+TARGET_BOARD_USE_ALC_AE_AWB := false
+TARGET_BOARD_USE_THIRD_AF_LIB_A := true
 
 #######################################################
 
@@ -210,7 +211,7 @@ BUILD_WITH_ALSA_UTILS := false
 BOARD_AUDIO_OLD_MODEM := false
 
 # power
-BOARD_POWERHINT_HAL := interhotplug
+BOARD_POWERHINT_HAL := interactive
 
 # Charger
 BACKLIGHT_PATH := "/sys/class/backlight/panel/brightness"

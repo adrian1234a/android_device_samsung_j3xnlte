@@ -65,6 +65,32 @@ public class SlteRIL extends RIL {
     }
 
     @Override
+    protected Object
+    responseCallForward(Parcel p) {
+        int numInfos;
+        CallForwardInfo infos[];
+
+        numInfos = p.readInt();
+
+        infos = new CallForwardInfo[numInfos];
+
+        for (int i = 0 ; i < numInfos ; i++) {
+            infos[i] = new CallForwardInfo();
+
+            infos[i].status = p.readInt();
+            infos[i].reason = p.readInt();
+            infos[i].serviceClass = p.readInt();
+            infos[i].toa = p.readInt();
+            infos[i].number = p.readString();
+            infos[i].timeSeconds = p.readInt();
+            p.readString(); // startTime
+            p.readString(); // endTime
+        }
+
+        return infos;
+    }
+
+    @Override
     public void
     acceptCall(Message result) {
         RILRequest rr =
@@ -252,30 +278,6 @@ public class SlteRIL extends RIL {
     }
 
     @Override
-    public void startLceService(int reportIntervalMs, boolean pullMode, Message response) {
-        unsupportedRequest("startLceService", response);
-    }
-
-    @Override
-    public void stopLceService(Message response) {
-        unsupportedRequest("stopLceService", response);
-    }
-
-    @Override
-    public void pullLceData(Message response) {
-        unsupportedRequest("pullLceData", response);
-    }
-
-    private void unsupportedRequest(String methodName, Message response) {
-        riljLog("[" + getClass().getSimpleName() + "] Ignore call to: " + methodName);
-        if (response != null) {
-            AsyncResult.forMessage(response, null, new CommandException(
-                    CommandException.Error.REQUEST_NOT_SUPPORTED));
-            response.sendToTarget();
-        }
-    }
-
-    @Override
     protected void
     processUnsolicited (Parcel p, int type) {
         int dataPosition, response;
@@ -312,5 +314,4 @@ public class SlteRIL extends RIL {
         }
     }
 }
-
 
